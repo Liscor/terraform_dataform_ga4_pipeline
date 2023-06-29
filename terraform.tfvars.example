@@ -1,0 +1,30 @@
+# Project ID where terraform will build the assests in 
+project_id = "moritz-test-projekt"
+
+# Serivce account path
+service_account_file = "moritz-test-projekt.json"
+
+# All resources will be built in this region
+region =  "europe-west3"
+
+# Used for error notfication alerting 
+notification_user = {
+    name: "Moritz Bauer"
+    email: "moritz@mohrstade.de"
+} 
+
+# Pub/Sub topic name for the log sink
+pub_sub_topic_name = "ga4_export_complete"
+
+# SQL statement to filter the logs for ga4 raw data imports - TEST IN CLOUD CONSOLE BEFORE USING
+ga4_log_filter = "protoPayload.methodName=\"jobservice.jobcompleted\"\nAND protoPayload.authenticationInfo.principalEmail=\"firebase-measurement@system.gserviceaccount.com\"\nAND protoPayload.serviceData.jobCompletedEvent.job.jobConfiguration.load.destinationTable.datasetId=\"analytics_262445815\"\nAND protoPayload.serviceData.jobCompletedEvent.job.jobConfiguration.load.destinationTable.tableId=~\"^events_20\\d+\""
+
+# SQL statement to find errors for dataform and workflow execution errors - TEST IN CLOUD CONSOLE BEFORE USING
+error_log_filter = "(resource.type=\"dataform.googleapis.com/Repository\" OR resource.type=\"workflows.googleapis.com/Workflow\")\nAND severity = \"ERROR\""
+
+# How long error logs will be saved in the log bucket
+log_bucket_retention_period = 180
+
+# The name of the dataform repository
+dataform_respository_name = "dataform_ga4_test"
+

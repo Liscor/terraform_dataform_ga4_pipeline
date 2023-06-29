@@ -1,0 +1,60 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "firebase-measurement@system.gserviceaccount.com"
+    },
+    "requestMetadata": {},
+    "serviceName": "bigquery.googleapis.com",
+    "methodName": "jobservice.jobcompleted",
+    "resourceName": "projects/artful-shelter-265814/jobs/622074148021analytics_262445815events_202306251687801330948664",
+    "serviceData": {
+      "@type": "type.googleapis.com/google.cloud.bigquery.logging.v1.AuditData",
+      "jobCompletedEvent": {
+        "eventName": "load_job_completed",
+        "job": {
+          "jobName": {
+            "projectId": "artful-shelter-265814",
+            "jobId": "622074148021analytics_262445815events_202306268687801330948664",
+            "location": "EU"
+          },
+          "jobConfiguration": {
+            "load": {
+              "destinationTable": {
+                "projectId": "artful-shelter-265814",
+                "datasetId": "analytics_262445815",
+                "tableId": "events_20230626"
+              },
+              "createDisposition": "CREATE_IF_NEEDED",
+              "writeDisposition": "WRITE_TRUNCATE",
+              "schemaJson": "{\n}"
+            }
+          },
+          "jobStatus": {
+            "state": "DONE",
+            "error": {}
+          },
+          "jobStatistics": {
+            "createTime": "2023-06-26T17:42:13.043Z",
+            "startTime": "2023-06-26T17:42:13.113Z",
+            "endTime": "2023-06-26T17:42:17.502Z",
+            "totalSlotMs": "152",
+            "totalLoadOutputBytes": "23135"
+          }
+        }
+      }
+    }
+  },
+  "insertId": "xks95be4kz4f",
+  "resource": {
+    "type": "bigquery_resource",
+    "labels": {
+      "project_id": "artful-shelter-265814"
+    }
+  },
+  "timestamp": "2023-06-26T17:42:17.521509Z",
+  "severity": "INFO",
+  "logName": "projects/artful-shelter-265814/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "receiveTimestamp": "2023-06-26T17:42:17.559653911Z"
+}

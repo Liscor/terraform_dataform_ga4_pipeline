@@ -1,0 +1,36 @@
+main:
+    params: [args]
+    steps:
+    - init:
+        assign:
+        # We take the table id from the pub/sub message
+        - table_id: $${json.decode(base64.decode(args.data.message.data)).protoPayload.serviceData.jobCompletedEvent.job.jobConfiguration.load.destinationTable.tableId}
+        - repository: projects/${project_id}/locations/${region}/repositories/${dataform_respository_name}
+    - logToLogging:
+        call: sys.log
+        args:
+            data: $${table_id}
+            #severity: "ERROR"
+    - createCompilationResult:
+        call: http.post
+        args:
+            url: $${"https://dataform.googleapis.com/v1beta1/" + repository + "/compilationResults"}
+            auth:
+                type: OAuth2
+            body:
+                gitCommitish: main
+                codeCompilationConfig:
+                    vars:
+                        ga4_table_id: $${table_id}
+        result: compilationResult
+    - createWorkflowInvocation:
+        call: http.post
+        args:
+            url: $${"https://dataform.googleapis.com/v1beta1/" + repository + "/workflowInvocations"}
+            auth:
+                type: OAuth2
+            body:
+                compilationResult: $${compilationResult.body.name}
+        result: workflowInvocation
+    - complete:
+        return: $${workflowInvocation.body.name}

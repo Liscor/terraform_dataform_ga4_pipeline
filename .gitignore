@@ -1,0 +1,7 @@
+.terraform
+moritz-test-projekt.json
+terraform.tfvars
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+workflow.yaml

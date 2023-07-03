@@ -53,6 +53,18 @@ resource "google_project_service" "pub_sub_api" {
   disable_on_destroy = false
 }
 
+#Alerts
+resource "google_project_service" "monitoring_api" {
+  service = "monitoring.googleapis.com"
+  disable_on_destroy = false
+}
+
+#For Log bucket
+resource "google_project_service" "logging_api" {
+  service = "logging.googleapis.com"
+  disable_on_destroy = false
+}
+
 # Grants access to the project number and other gcp meta data fields
 data "google_project" "project" {
   project_id =  var.project_id
@@ -101,7 +113,7 @@ resource "google_logging_project_sink" "ga4_raw_data_export" {
   name        = "ga4_raw_data_export"
   destination = "pubsub.googleapis.com/projects/${var.project_id}/topics/${var.pub_sub_topic_name}"
   filter = var.ga4_log_filter
-  depends_on = [ google_pubsub_topic.ga4_export_complete ]
+  depends_on = [ google_pubsub_topic.ga4_export_complete, google_project_service.logging_api ]
 }
 
 #Grant pub/sub standard service account access to serviceAccountTokenCreator
@@ -182,6 +194,7 @@ resource "google_logging_project_bucket_config" "dataform_error_bucket" {
     location  = var.region
     retention_days = var.log_bucket_retention_period
     bucket_id = "dataform_error_bucket"
+    depends_on = [ google_project_service.logging_api ]
 }
 
 resource "google_logging_project_sink" "dataform_execution_errors" {
@@ -198,6 +211,7 @@ resource "google_monitoring_notification_channel" "notification_channel" {
     email_address = var.notification_user.email
   }
   force_delete = false
+  depends_on = [ google_project_service.monitoring_api ]
 }
 ## Create a log alert_policy for workflow and dataform errors
 resource "google_monitoring_alert_policy" "alert_policy" {

@@ -2,11 +2,11 @@ terraform {
   required_providers {
     google = {
       source = "hashicorp/google"
-      version = "4.70.0"
+      version = "4.72.1"
     }
     google-beta = {
       source = "hashicorp/google-beta"
-      version = "4.70.0"
+      version = "4.72.1"
     }
   }
 }
@@ -116,6 +116,15 @@ resource "google_logging_project_sink" "ga4_raw_data_export" {
   depends_on = [ google_pubsub_topic.ga4_export_complete, google_project_service.logging_api ]
 }
 
+# Add log sink service account to pub/sub topic and provide pub/sub publish rights
+resource "google_pubsub_topic_iam_member" "pubsub_topic_add_sa" {
+  project = var.project_id
+  topic = google_pubsub_topic.ga4_export_complete.name
+  role = "roles/pubsub.publisher"
+  member = "serviceAccount:cloud-logs@system.gserviceaccount.com"
+  depends_on = [ google_logging_project_sink.ga4_raw_data_export ]
+}
+
 #Grant pub/sub standard service account access to serviceAccountTokenCreator
 resource "google_project_iam_binding" "project_binding_pubsub" {
   provider = google-beta
@@ -126,9 +135,9 @@ resource "google_project_iam_binding" "project_binding_pubsub" {
 }
 
 # Create a service account for Eventarc trigger and Workflows
-resource "google_service_account" "eventarc_workflows_service_account" {
+resource "google_service_account" "dataform_ga4_pipeline" {
   provider     = google-beta
-  account_id   = "eventarc-workflows-sa"
+  account_id   = "dataform-ga4-pipeline"
   display_name = "Eventarc Workflows Service Account"
   depends_on = [ google_project_service.iam_api ]
 }
@@ -138,8 +147,8 @@ resource "google_project_iam_binding" "project_binding_eventarc" {
   provider = google-beta
   project  = data.google_project.project.id
   role     = "roles/logging.logWriter"
-  members = ["serviceAccount:${google_service_account.eventarc_workflows_service_account.email}"]
-  depends_on = [google_service_account.eventarc_workflows_service_account]
+  members = ["serviceAccount:${google_service_account.dataform_ga4_pipeline.email}"]
+  depends_on = [google_service_account.dataform_ga4_pipeline]
 }
 
 # Grant the workflows.invoker role to the service account
@@ -147,25 +156,25 @@ resource "google_project_iam_binding" "project_binding_workflows" {
   provider = google-beta
   project  = data.google_project.project.id
   role     = "roles/workflows.invoker"
-  members = ["serviceAccount:${google_service_account.eventarc_workflows_service_account.email}"]
-  depends_on = [google_service_account.eventarc_workflows_service_account]
+  members = ["serviceAccount:${google_service_account.dataform_ga4_pipeline.email}"]
+  depends_on = [google_service_account.dataform_ga4_pipeline]
 }
 
 resource "google_project_iam_binding" "project_binding_dataform" {
   provider = google-beta
   project  = data.google_project.project.id
   role     = "roles/dataform.serviceAgent"
-  members = ["serviceAccount:${google_service_account.eventarc_workflows_service_account.email}"]
-  depends_on = [google_service_account.eventarc_workflows_service_account]
+  members = ["serviceAccount:${google_service_account.dataform_ga4_pipeline.email}"]
+  depends_on = [google_service_account.dataform_ga4_pipeline]
 }
 
 # We create a workflow which will be used to execute dataform 
 resource "google_workflows_workflow" "execute_dataform_ga4" {
   name            = "execute_dataform_ga4"
-  service_account = google_service_account.eventarc_workflows_service_account.email
+  service_account = google_service_account.dataform_ga4_pipeline.email
   source_contents = templatefile("workflow.tftpl", {project_id = var.project_id, region = var.region, dataform_respository_name = var.dataform_respository_name})
   depends_on = [ google_project_service.workflows_api,
-  google_service_account.eventarc_workflows_service_account ]
+  google_service_account.dataform_ga4_pipeline ]
 }
 
 # We create an event arc pub/sub trigger for the dataform workflow
@@ -184,8 +193,8 @@ resource "google_eventarc_trigger" "ga4_data_updated" {
   destination {
     workflow = "projects/${var.project_id}/locations/${var.region}/workflows/execute_dataform_ga4"
   }
-  service_account = google_service_account.eventarc_workflows_service_account.email
-  depends_on = [ google_project_service.eventarc_api, google_workflows_workflow.execute_dataform_ga4 ]
+  service_account = google_service_account.dataform_ga4_pipeline.email
+  depends_on = [ google_project_service.eventarc_api, google_workflows_workflow.execute_dataform_ga4, google_pubsub_topic.ga4_export_complete ]
 }
 
 # Saving errors longer than the standard 30 days

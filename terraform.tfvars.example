@@ -28,3 +28,5 @@ log_bucket_retention_period = 180
 # The name of the dataform repository
 dataform_respository_name = "dataform_ga4_test"
 
+# The name of the Dataform workspace
+dataform_workspace_name = "google_analytics_4"

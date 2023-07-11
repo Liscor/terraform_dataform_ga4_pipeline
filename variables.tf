@@ -31,6 +31,11 @@ variable "dataform_respository_name" {
   type = string
 }
 
+variable "dataform_workspace_name" {
+  description = "The name of the workspace within the Dataform repository to automize"
+  type = string
+}
+
 variable "ga4_log_filter" {
   description = "The SQL statement to filter the logs for ga4 raw data imports"
   type = string

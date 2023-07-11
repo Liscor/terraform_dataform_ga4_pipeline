@@ -172,7 +172,7 @@ resource "google_project_iam_binding" "project_binding_dataform" {
 resource "google_workflows_workflow" "execute_dataform_ga4" {
   name            = "execute_dataform_ga4"
   service_account = google_service_account.dataform_ga4_pipeline.email
-  source_contents = templatefile("workflow.tftpl", {project_id = var.project_id, region = var.region, dataform_respository_name = var.dataform_respository_name})
+  source_contents = templatefile("workflow.tftpl", {project_id = var.project_id, region = var.region, dataform_respository_name = var.dataform_respository_name, dataform_workspace_name = var.dataform_workspace_name})
   depends_on = [ google_project_service.workflows_api,
   google_service_account.dataform_ga4_pipeline ]
 }

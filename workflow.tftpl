@@ -18,7 +18,7 @@ main:
             auth:
                 type: OAuth2
             body:
-                gitCommitish: main
+                gitCommitish: ${dataform_workspace_name}
                 codeCompilationConfig:
                     vars:
                         ga4_table_id: $${table_id}

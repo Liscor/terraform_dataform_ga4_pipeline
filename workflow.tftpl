@@ -24,7 +24,12 @@ main:
                         vars:
                             ga4_table_id: $${table_id}
             result: compilationResult
-        retry: ${http.default_retry}
+        retry:
+            max_retries: 3
+            backoff:
+                initial_delay: 3600
+                max_delay: 3600
+                multiplier: 2
     - createWorkflowInvocation:
         call: http.post
         args:

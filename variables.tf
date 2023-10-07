@@ -3,11 +3,6 @@ variable "project_id" {
   type        = string
 }
 
-variable "service_account_file" {
-  description = "The path to the service account file for deployment"
-  type        = string
-}
-
 variable "region" {
   description = "The name of the region to deploy within"
   type        = string

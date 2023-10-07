@@ -1,9 +1,6 @@
 # Project ID where terraform will build the assests in 
 project_id = "moritz-test-projekt"
 
-# Serivce account path
-service_account_file = "moritz-test-projekt.json"
-
 # All resources will be built in this region
 region =  "europe-west3"
 

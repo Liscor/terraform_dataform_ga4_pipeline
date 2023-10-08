@@ -10,10 +10,9 @@ Dataform raw data transformation based on the GA4 BigQuery export.
 
 
 ## Getting Started
-1. Use Google Application Default Credentials for authentification 
-2. Activate the `cloudresourcemanager.googleapis.com` and `serviceusage.googleapis.com` API within Google Cloud Console
-3. Clone this repository and make sure you have installed [Terraform](https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/install-cli).
-4. Change the variables inside terraform.tfvars.example to suit your needs and rename the file to terraform.tfvars.
+1. Use Google Application Default Credentials for authentication to your desired GCP Project
+2. Clone this repository and make sure you have installed [Terraform](https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/install-cli).
+3. Change the variables inside terraform.tfvars.example to suit your needs and rename the file to terraform.tfvars.
 This will be used to configure where the infrastructure will be deployed on and where notifications will be sent to. Don't forget to
 replaced the name of the GA4 dataset within the ga4_log_filter variable.
 1. Run `terraform init` to initialize the repository and `terraform apply` the infrastructure will be built on GCP

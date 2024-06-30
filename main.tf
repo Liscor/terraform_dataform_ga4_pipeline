@@ -212,15 +212,25 @@ resource "google_logging_project_sink" "dataform_execution_errors" {
 }
 
 resource "google_monitoring_notification_channel" "notification_channel" {
-  display_name = "${var.notification_user.name}"
+  count = length(var.notification_users)
+
+  display_name = var.notification_users[count.index].name
   type         = "email"
   labels = {
-    email_address = var.notification_user.email
+    email_address = var.notification_users[count.index].email
   }
   force_delete = false
   depends_on = [ google_project_service.monitoring_api ]
 }
+
 ## Create a log alert_policy for workflow and dataform errors
+
+locals {
+  notification_channel_ids = [
+    for nc in google_monitoring_notification_channel.notification_channel : nc.id
+  ]
+}
+
 resource "google_monitoring_alert_policy" "alert_policy" {
   display_name = "Dataform/Workflow Errors"
   combiner     = "OR"
@@ -249,6 +259,6 @@ resource "google_monitoring_alert_policy" "alert_policy" {
       period = "300s"
     }  
   }
-  notification_channels = [google_monitoring_notification_channel.notification_channel.id]
+  notification_channels = local.notification_channel_ids
   depends_on = [ google_logging_project_sink.dataform_execution_errors, google_monitoring_notification_channel.notification_channel ]
 }

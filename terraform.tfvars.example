@@ -5,10 +5,12 @@ project_id = "moritz-test-projekt"
 region =  "europe-west3"
 
 # Used for error notfication alerting 
-notification_user = {
-    name: "Moritz Bauer"
-    email: "moritz@mohrstade.de"
-} 
+notification_users = [
+    {
+      name  = "Moritz Bauer"
+      email = "moritz@mohrstade.de"
+    }
+  ]
 
 # Pub/Sub topic name for the log sink
 pub_sub_topic_name = "ga4_export_complete"

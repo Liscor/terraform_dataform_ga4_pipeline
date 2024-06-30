@@ -8,12 +8,12 @@ variable "region" {
   type        = string
 }
 
-variable "notification_user" {
-  description = "The name and e-mail address used in the notification channel setup"
-  type        = object({
+variable "notification_users" {
+  description = "The names and e-mail addresses used in the notification channel setup"
+  type = list(object({
     name  = string
     email = string
-  })
+  }))
 }
 
 variable "pub_sub_topic_name" {
